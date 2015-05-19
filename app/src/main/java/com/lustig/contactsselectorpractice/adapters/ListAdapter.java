@@ -16,14 +16,8 @@ import com.lustig.contactsselectorpractice.model.Contact;
 import com.lustig.contactsselectorpractice.viewholders.ItemHolder;
 
 import java.util.ArrayList;
-import java.util.Set;
 
-/**
- * Created by lustig on 5/14/15.
- */
 public class ListAdapter extends RecyclerView.Adapter<ItemHolder> {
-
-    private Set<String> mKeySet;
 
     // This will hold all of the contacts
     ArrayList<Contact> mContacts;
@@ -116,8 +110,6 @@ public class ListAdapter extends RecyclerView.Adapter<ItemHolder> {
 
                             removeFromSelectedContacts(contact);
                         }
-
-                        ((MainActivity) mContext).clearEditText();
                     }
                 });
 
@@ -141,6 +133,8 @@ public class ListAdapter extends RecyclerView.Adapter<ItemHolder> {
                 Toast.LENGTH_SHORT)
              .show();
 
+        ((MainActivity) mContext).highlightText();
+
     }
 
     public void removeFromSelectedContacts(Contact contactToRemove) {
@@ -156,6 +150,8 @@ public class ListAdapter extends RecyclerView.Adapter<ItemHolder> {
                 contactToRemove.getName() + " is now removed",
                 Toast.LENGTH_SHORT)
              .show();
+
+        ((MainActivity) mContext).highlightText();
     }
 
     @Override

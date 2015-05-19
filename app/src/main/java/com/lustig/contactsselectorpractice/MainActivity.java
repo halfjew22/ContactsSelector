@@ -3,14 +3,18 @@ package com.lustig.contactsselectorpractice;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.MotionEvent;
+import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 
 import com.lustig.contactsselectorpractice.adapters.ListAdapter;
 import com.lustig.contactsselectorpractice.interfaces.OnContactsLoadCompleteListener;
@@ -37,6 +41,10 @@ public class MainActivity extends ActionBarActivity implements OnContactsLoadCom
 
     int searchTextLength = 0;
 
+    private GestureDetectorCompat mDetector;
+
+    LinearLayout mRootLayout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -48,75 +56,105 @@ public class MainActivity extends ActionBarActivity implements OnContactsLoadCom
 
         mEditText = (EditText) findViewById(R.id.editText);
 
+        mEditText.setOnClickListener(
+                new View.OnClickListener() {
+
+                    @Override
+                    public void onClick(View v) {
+                        if (mEditText.getText().length() != 0) {
+                            mEditText.selectAll();
+                        }
+                    }
+                });
+
         mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
 
         mRecyclerView.setOnScrollListener(
                 new RecyclerView.OnScrollListener() {
 
                     @Override
-                    public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                    public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                        super.onScrollStateChanged(recyclerView, newState);
 
-                        //super.onScrolled(recyclerView, dx, dy);
+                        Log.d("Lustig", "onScrollStateChanged");
                         hideKeyboard(MainActivity.this);
-
                     }
                 });
 
-        mEditText.addTextChangedListener(new TextWatcher() {
+        mRecyclerView.setOnTouchListener(
+                new View.OnTouchListener() {
 
-            public void afterTextChanged(Editable s) {}
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        Log.d("Lustig", "onTouch root layout");
 
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+                        hideKeyboard(MainActivity.this);
 
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                        return false;
+                    }
+                });
 
-                Log.d("Lustig", "onTextChanged");
+        mEditText.addTextChangedListener(
+                new TextWatcher() {
 
-                searchTextLength = mEditText.getText().length();
-                mSearchResultsArray.clear();
+                    public void afterTextChanged(Editable s) {
 
-                for (Contact contact : mContacts) {
+                    }
 
-                    String name = contact.getName();
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
-                    String[] names = name.split(" ");
+                    }
 
-                    String firstName = names[0];
-                    String lastName = names[names.length - 1];
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
 
-                    for (String singleName : names) {
+                        Log.d("Lustig", "onTextChanged");
 
-                        if (searchTextLength <= singleName.length()) {
+                        searchTextLength = mEditText.getText().length();
+                        mSearchResultsArray.clear();
 
-//                        if (name.toLowerCase().contains(s.toString().toLowerCase())) {
-//                            mSearchResultsArray.add(contact);
-//                        }
+                        for (Contact contact : mContacts) {
 
-                            Log.d("Lustig", "First name: " + firstName);
-                            Log.d("Lustig", "Last name: " + lastName);
+                            String name = contact.getName();
 
-                            // ToDo implement a Trie to improve performance beyond O(N)
+                            String[] names = name.split(" ");
 
-                            // This block of code searches for strings /starting with/ the search string. The above searches for contacts that contain the search string.
-                            if (mEditText.getText().toString().equalsIgnoreCase((String) singleName.subSequence(0, searchTextLength))) {
-                                mSearchResultsArray.add(contact);
+                            for (String singleName : names) {
 
-                                // If a Contact is added, I don't want to add duplicates
-                                break;
+                                if (searchTextLength <= singleName.length()) {
+
+                                    // ToDo implement a Trie to improve performance beyond O(N)
+
+                                    // This block of code searches for strings /starting with/ the search string. The above searches for contacts that contain the search string.
+                                    if (mEditText.getText().toString().equalsIgnoreCase((String) singleName.subSequence(0, searchTextLength))) {
+                                        mSearchResultsArray.add(contact);
+
+                                        // If a Contact is added, I don't want to add duplicates
+                                        break;
+                                    }
+                                }
                             }
                         }
+
+                        mAdapter = new ListAdapter(mSearchResultsArray, MainActivity.this);
+                        mRecyclerView.swapAdapter(mAdapter, true);
                     }
-                }
-
-                mAdapter = new ListAdapter(mSearchResultsArray, MainActivity.this);
-                mRecyclerView.swapAdapter(mAdapter, true);
-            }
-        });
+                });
     }
 
-    public void clearEditText() {
-        mEditText.setText("");
+    public void highlightText() {
+
+        mEditText.requestFocus();
+        mEditText.selectAll();
+
+        // If the user has searched for a Contact, highlight AND open keyboard
+        // Otherwise, just highlight the text and prepare for the event the user
+        // might want to search for a different Contact
+        if (mEditText.getText().length() != 0) {
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.showSoftInput(mEditText, InputMethodManager.SHOW_IMPLICIT);
+        }
     }
+
 
     @Override
     protected void onPause() {
@@ -164,7 +202,7 @@ public class MainActivity extends ActionBarActivity implements OnContactsLoadCom
 
     public void hideKeyboard(Context activity) {
 
-        InputMethodManager inputMethodManager = (InputMethodManager)  activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        InputMethodManager inputMethodManager = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(((Activity) activity).getCurrentFocus().getWindowToken(), 0);
 
 
