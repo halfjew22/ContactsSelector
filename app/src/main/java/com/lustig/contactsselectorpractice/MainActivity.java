@@ -47,21 +47,20 @@ public class MainActivity extends ActionBarActivity implements OnContactsLoadCom
         ThisApplication.setOnContactsLoadedListener(this);
 
         mEditText = (EditText) findViewById(R.id.editText);
+
         mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
 
-//        mEditText.setOnFocusChangeListener(
-//                new View.OnFocusChangeListener() {
-//
-//                    @Override
-//                    public void onFocusChange(View v, boolean hasFocus) {
-//
-//                        Log.d("Lustig", "onFocusChange");
-//
-//                        if (!hasFocus) {
-//                            hideKeyboard(v);
-//                        }
-//                    }
-//                });
+        mRecyclerView.setOnScrollListener(
+                new RecyclerView.OnScrollListener() {
+
+                    @Override
+                    public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+
+                        //super.onScrolled(recyclerView, dx, dy);
+                        hideKeyboard(MainActivity.this);
+
+                    }
+                });
 
         mEditText.addTextChangedListener(new TextWatcher() {
 
@@ -101,6 +100,9 @@ public class MainActivity extends ActionBarActivity implements OnContactsLoadCom
                             // This block of code searches for strings /starting with/ the search string. The above searches for contacts that contain the search string.
                             if (mEditText.getText().toString().equalsIgnoreCase((String) singleName.subSequence(0, searchTextLength))) {
                                 mSearchResultsArray.add(contact);
+
+                                // If a Contact is added, I don't want to add duplicates
+                                break;
                             }
                         }
                     }
