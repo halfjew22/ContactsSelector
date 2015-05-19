@@ -1,6 +1,7 @@
 package com.lustig.contactsselectorpractice;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -8,7 +9,6 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
@@ -49,21 +49,19 @@ public class MainActivity extends ActionBarActivity implements OnContactsLoadCom
         mEditText = (EditText) findViewById(R.id.editText);
         mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
 
-        mEditText.setOnFocusChangeListener(
-                new View.OnFocusChangeListener() {
-
-                    @Override
-                    public void onFocusChange(View v, boolean hasFocus) {
-
-                        if (!hasFocus) {
-                            hideKeyboard(v);
-                        }
-                    }
-                });
-
-
-        // By using setAdpater method in listview we an add string array in list.
-//        mListView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, mListViewArray));
+//        mEditText.setOnFocusChangeListener(
+//                new View.OnFocusChangeListener() {
+//
+//                    @Override
+//                    public void onFocusChange(View v, boolean hasFocus) {
+//
+//                        Log.d("Lustig", "onFocusChange");
+//
+//                        if (!hasFocus) {
+//                            hideKeyboard(v);
+//                        }
+//                    }
+//                });
 
         mEditText.addTextChangedListener(new TextWatcher() {
 
@@ -82,23 +80,39 @@ public class MainActivity extends ActionBarActivity implements OnContactsLoadCom
 
                     String name = contact.getName();
 
-                    if (searchTextLength <= name.length()) {
-                        if (mEditText.getText().toString().equalsIgnoreCase((String) name.subSequence(0, searchTextLength))) {
-                            mSearchResultsArray.add(contact);
+                    String[] names = name.split(" ");
+
+                    String firstName = names[0];
+                    String lastName = names[names.length - 1];
+
+                    for (String singleName : names) {
+
+                        if (searchTextLength <= singleName.length()) {
+
+//                        if (name.toLowerCase().contains(s.toString().toLowerCase())) {
+//                            mSearchResultsArray.add(contact);
+//                        }
+
+                            Log.d("Lustig", "First name: " + firstName);
+                            Log.d("Lustig", "Last name: " + lastName);
+
+                            // ToDo implement a Trie to improve performance beyond O(N)
+
+                            // This block of code searches for strings /starting with/ the search string. The above searches for contacts that contain the search string.
+                            if (mEditText.getText().toString().equalsIgnoreCase((String) singleName.subSequence(0, searchTextLength))) {
+                                mSearchResultsArray.add(contact);
+                            }
                         }
                     }
-
-                    // TODO IMPORTANT. COME BACK HERE AND FIGURE OUT WHY THIS ISN'T WORKING PROPERLY
-                    // You aren't setting the adapter to the recycler view, and even if you were, it's not in the right place. Find that article
-
-                    mAdapter = new ListAdapter(mSearchResultsArray, MainActivity.this);
                 }
+
+                mAdapter = new ListAdapter(mSearchResultsArray, MainActivity.this);
+                mRecyclerView.swapAdapter(mAdapter, true);
             }
         });
     }
 
     public void clearEditText() {
-
         mEditText.setText("");
     }
 
@@ -110,8 +124,8 @@ public class MainActivity extends ActionBarActivity implements OnContactsLoadCom
         Log.d("Lustig", "MainActivity: onPause");
         Log.d("Lustig", "Should I save the selectedContacts here?");
 
-        ArrayList<Contact> contacts = mAdapter.getContacts();
-        Contact.Helper.saveContacts(contacts);
+//        ArrayList<Contact> contacts = mAdapter.getContacts();
+        Contact.Helper.saveContacts(mContacts);
     }
 
     @Override
@@ -130,6 +144,7 @@ public class MainActivity extends ActionBarActivity implements OnContactsLoadCom
              */
         } else {
 
+            // ToDo Add loading spinner if contacts are being loaded
             mContacts = new ArrayList<Contact>();
 
             setUpRecyclerView();
@@ -145,10 +160,14 @@ public class MainActivity extends ActionBarActivity implements OnContactsLoadCom
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
     }
 
-    public void hideKeyboard(View view) {
+    public void hideKeyboard(Context activity) {
 
-        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
-        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        InputMethodManager inputMethodManager = (InputMethodManager)  activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(((Activity) activity).getCurrentFocus().getWindowToken(), 0);
+
+
+//        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
+//        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
     @Override

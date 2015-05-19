@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.Toast;
 
 import com.lustig.contactsselectorpractice.MainActivity;
 import com.lustig.contactsselectorpractice.R;
@@ -60,7 +61,7 @@ public class ListAdapter extends RecyclerView.Adapter<ItemHolder> {
 
         final CheckBox checkBox = viewHolder.checkBox;
 
-        String currentName = contact.getName();
+        final String currentName = contact.getName();
         String currentPhoneNumber = contact.getNumber();
 
         boolean isChecked = contact.isSelected();
@@ -78,7 +79,9 @@ public class ListAdapter extends RecyclerView.Adapter<ItemHolder> {
                     @Override
                     public void onClick(View v) {
 
-
+                        // Q: Will this crash the app if keybaord isn't showing?
+                        // A: Doesn't look like it!! Wahooo!
+                        hideKeyboard();
 
                         if (checkBox.isChecked()) {
                             addToSelectedContacts(contact);
@@ -96,6 +99,10 @@ public class ListAdapter extends RecyclerView.Adapter<ItemHolder> {
                     public void onClick(View v) {
 
                         Log.d("Lustig", "onClick root of list_item");
+
+                        // Q: Will this crash the app if keybaord isn't showing?
+                        // A: Doesn't look like it!! Wahooo!
+                        hideKeyboard();
 
                         if (!checkBox.isChecked()) {
 
@@ -116,6 +123,10 @@ public class ListAdapter extends RecyclerView.Adapter<ItemHolder> {
 
     }
 
+    private void hideKeyboard() {
+        ((MainActivity) mContext).hideKeyboard(mContext);
+    }
+
     public void addToSelectedContacts(Contact contactToAdd) {
 
         // First, set that this contact is now selected
@@ -123,6 +134,12 @@ public class ListAdapter extends RecyclerView.Adapter<ItemHolder> {
 
         // Then, add contact to selected contacts list
         mSelectedContacts.add(contactToAdd);
+
+        Toast.makeText(
+                mContext,
+                contactToAdd.getName() + " is now selected",
+                Toast.LENGTH_SHORT)
+             .show();
 
     }
 
@@ -133,11 +150,16 @@ public class ListAdapter extends RecyclerView.Adapter<ItemHolder> {
 
         // Then, remove the contact from the selected contacts list
         mSelectedContacts.remove(contactToRemove);
+
+        Toast.makeText(
+                mContext,
+                contactToRemove.getName() + " is now removed",
+                Toast.LENGTH_SHORT)
+             .show();
     }
 
     @Override
     public int getItemCount() {
-
         return mContacts.size();
     }
 
