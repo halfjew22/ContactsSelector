@@ -61,8 +61,35 @@ public class MainActivity extends ActionBarActivity implements OnContactsLoadCom
 
                     @Override
                     public void onClick(View v) {
+
                         if (mEditText.getText().length() != 0) {
-                            mEditText.selectAll();
+                            mEditText.setSelection(mEditText.getText().length());
+                        }
+                    }
+                });
+
+        mEditText.setOnFocusChangeListener(
+                new View.OnFocusChangeListener() {
+
+                    @Override
+                    public void onFocusChange(View v, boolean hasFocus) {
+
+                        if (hasFocus) {
+                            Log.d("Lustig", "hasFocus!");
+
+                            mEditText.postDelayed(
+                                    new Runnable() {
+
+                                        @Override
+                                        public void run() {
+                                            InputMethodManager keyboard = (InputMethodManager)
+                                                    getSystemService(Context.INPUT_METHOD_SERVICE);
+                                            keyboard.showSoftInput(mEditText, 0);
+                                        }
+                                    }, 200);
+
+                        } else {
+                            Log.d("Lustig", "does NOT have focus!");
                         }
                     }
                 });
@@ -74,6 +101,7 @@ public class MainActivity extends ActionBarActivity implements OnContactsLoadCom
 
                     @Override
                     public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+
                         super.onScrollStateChanged(recyclerView, newState);
 
                         Log.d("Lustig", "onScrollStateChanged");
@@ -86,6 +114,7 @@ public class MainActivity extends ActionBarActivity implements OnContactsLoadCom
 
                     @Override
                     public boolean onTouch(View v, MotionEvent event) {
+
                         Log.d("Lustig", "onTouch root layout");
 
                         hideKeyboard(MainActivity.this);
@@ -109,8 +138,9 @@ public class MainActivity extends ActionBarActivity implements OnContactsLoadCom
 
                         Log.d("Lustig", "onTextChanged");
 
-                        searchTextLength = mEditText.getText().length();
                         mSearchResultsArray.clear();
+
+                        searchTextLength = mEditText.getText().length();
 
                         for (Contact contact : mContacts) {
 
@@ -189,6 +219,8 @@ public class MainActivity extends ActionBarActivity implements OnContactsLoadCom
 
             setUpRecyclerView();
         }
+
+        mEditText.requestFocus();
     }
 
     private void setUpRecyclerView() {
