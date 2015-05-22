@@ -8,6 +8,11 @@
     android:focusableInTouchMode="true"
     android:orientation="vertical">
 
+    <include
+        layout="@layout/my_super_toolbar" />
+
+    <!-- Removing EditText in place of Toolbar
+
     <EditText
         android:id="@+id/editText"
         android:layout_margin="8dp"
@@ -15,6 +20,8 @@
         android:layout_height="wrap_content"
         android:singleLine="true"
         android:hint="Search"/>
+
+        -->
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerView"

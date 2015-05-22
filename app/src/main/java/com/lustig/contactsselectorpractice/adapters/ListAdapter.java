@@ -10,14 +10,14 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.Toast;
 
-import com.lustig.contactsselectorpractice.MainActivity;
+import com.lustig.contactsselectorpractice.ContactSelectorActivity;
 import com.lustig.contactsselectorpractice.R;
 import com.lustig.contactsselectorpractice.model.Contact;
-import com.lustig.contactsselectorpractice.viewholders.ItemHolder;
+import com.lustig.contactsselectorpractice.viewholders.ContactViewHolder;
 
 import java.util.ArrayList;
 
-public class ListAdapter extends RecyclerView.Adapter<ItemHolder> {
+public class ListAdapter extends RecyclerView.Adapter<ContactViewHolder> {
 
     // This will hold all of the contacts
     ArrayList<Contact> mContacts;
@@ -39,16 +39,16 @@ public class ListAdapter extends RecyclerView.Adapter<ItemHolder> {
     }
 
     @Override
-    public ItemHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+    public ContactViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
 
-        View v = mInflater.inflate(R.layout.list_item, viewGroup, false);
-        ItemHolder holder = new ItemHolder(v);
+        View v = mInflater.inflate(R.layout.list_item_contact, viewGroup, false);
+        ContactViewHolder holder = new ContactViewHolder(v);
 
         return holder;
     }
 
     @Override
-    public void onBindViewHolder(final ItemHolder viewHolder, final int position) {
+    public void onBindViewHolder(final ContactViewHolder viewHolder, final int position) {
 
         // Gets the Contact from the ArrayList for the current position
         final Contact contact = mContacts.get(position);
@@ -92,7 +92,7 @@ public class ListAdapter extends RecyclerView.Adapter<ItemHolder> {
                     @Override
                     public void onClick(View v) {
 
-                        Log.d("Lustig", "onClick root of list_item");
+                        Log.d("Lustig", "onClick root of list_item_contact");
 
                         // Q: Will this crash the app if keybaord isn't showing?
                         // A: Doesn't look like it!! Wahooo!
@@ -116,7 +116,7 @@ public class ListAdapter extends RecyclerView.Adapter<ItemHolder> {
     }
 
     private void hideKeyboard() {
-        ((MainActivity) mContext).hideKeyboard(mContext);
+        ((ContactSelectorActivity) mContext).hideKeyboard(mContext);
     }
 
     public void addToSelectedContacts(Contact contactToAdd) {
@@ -133,7 +133,7 @@ public class ListAdapter extends RecyclerView.Adapter<ItemHolder> {
                 Toast.LENGTH_SHORT)
              .show();
 
-        ((MainActivity) mContext).highlightText();
+        ((ContactSelectorActivity) mContext).highlightText();
 
     }
 
@@ -151,7 +151,7 @@ public class ListAdapter extends RecyclerView.Adapter<ItemHolder> {
                 Toast.LENGTH_SHORT)
              .show();
 
-        ((MainActivity) mContext).highlightText();
+        ((ContactSelectorActivity) mContext).highlightText();
     }
 
     @Override

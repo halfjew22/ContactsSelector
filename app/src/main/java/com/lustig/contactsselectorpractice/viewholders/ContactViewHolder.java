@@ -9,7 +9,7 @@ import android.widget.TextView;
 import com.lustig.contactsselectorpractice.R;
 
 
-public class ItemHolder extends RecyclerView.ViewHolder {
+public class ContactViewHolder extends RecyclerView.ViewHolder {
 
     public RelativeLayout root;
 
@@ -18,7 +18,7 @@ public class ItemHolder extends RecyclerView.ViewHolder {
     public TextView textViewName;
     public TextView textViewNumber;
 
-    public ItemHolder(View itemView) {
+    public ContactViewHolder(View itemView) {
         super(itemView);
 
         root = (RelativeLayout) itemView.findViewById(R.id.rootLayout);

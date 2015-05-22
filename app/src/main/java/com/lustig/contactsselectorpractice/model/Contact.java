@@ -74,9 +74,11 @@ public class Contact implements Comparable<Contact> {
             String jsonContacts = appSharedPrefs.getString(Helper.PREFS_TAG, "NONE");
 
             Gson gson = new Gson();
+
             Type type = new TypeToken<ArrayList<Contact>>() {
 
             }.getType();
+
             contacts = gson.fromJson(jsonContacts, type);
 
             return contacts;

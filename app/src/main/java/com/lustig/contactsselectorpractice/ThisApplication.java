@@ -57,7 +57,6 @@ public class ThisApplication extends Application{
         if (jsonContacts.equals("NONE")) {
             Log.d("Lustig", "No contacts found, loading from scratch");
         } else {
-            Log.d("Lustig", "Victory?");
             Log.d("Lustig", "Contacts are already loaded - ThisApplication");
             haveContactsLoaded = true;
             return;
